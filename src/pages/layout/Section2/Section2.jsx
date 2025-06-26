@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function Section2() {
   const [products, setProducts] = useState([]);
 
-  // oldPrice hisoblovchi funksiya
   const getOldPrice = (price, skidka) => {
     if (!skidka?.includes("%")) return null;
     const percent = parseInt(skidka.replace("%", ""));
@@ -17,6 +18,17 @@ export default function Section2() {
       .then((data) => setProducts(data))
       .catch((err) => console.error(err));
   }, []);
+
+  const handleShare = (id) => {
+    const link = `${window.location.origin}/product/${id}`;
+    navigator.clipboard.writeText(link)
+      .then(() => {
+        toast.success("🔗 Link copied!", { position: "top-right" });
+      })
+      .catch(() => {
+        toast.error("❌ Failed to copy!", { position: "top-right" });
+      });
+  };
 
   return (
     <section className="py-16 bg-[#f9f9f9]">
@@ -58,8 +70,18 @@ export default function Section2() {
                     Add to cart
                   </button>
                   <div className="flex gap-4 text-sm">
-                    <span className="cursor-pointer hover:underline">Share</span>
-                    <span className="cursor-pointer hover:underline">Compare</span>
+                    <span
+                      onClick={() => handleShare(item.id)}
+                      className="cursor-pointer hover:underline"
+                    >
+                      Share
+                    </span>
+                    <Link
+                      to={`/product/${item.id}`}
+                      className="cursor-pointer hover:underline text-sm"
+                    >
+                      View
+                    </Link>
                     <span className="cursor-pointer hover:underline">Like</span>
                   </div>
                 </div>
@@ -70,11 +92,11 @@ export default function Section2() {
                   <p className="text-sm text-gray-500">{item.desc}</p>
                   <div className="mt-2 flex items-center gap-2">
                     <p className="text-[#000000] font-bold">
-                      Rp {Number(item.price).toLocaleString()}
+                      So'm {Number(item.price).toLocaleString()}
                     </p>
                     {oldPrice && (
                       <span className="text-sm line-through text-gray-400">
-                        Rp {Number(oldPrice).toLocaleString()}
+                       So'm {Number(oldPrice).toLocaleString()}
                       </span>
                     )}
                   </div>
@@ -93,6 +115,9 @@ export default function Section2() {
           </Link>
         </div>
       </div>
+
+      {/* Toastify Container */}
+      <ToastContainer />
     </section>
   );
 }
